@@ -74,7 +74,11 @@ export class MainScene extends Phaser.Scene {
       repeat: -1,
     });
 
-    const placeButton = (key: string, x: number, buttonWidth: number) =>
+    // 캐릭터를 누르면 누른 자리에서 하트 뿅뿅 (투명한 부분은 눌러도 반응 없음)
+    character.setInteractive({ pixelPerfect: true });
+    character.on('pointerdown', (pointer: Phaser.Input.Pointer) => this.popHearts(pointer.worldX, pointer.worldY));
+
+    const placeButton =(key: string, x: number, buttonWidth: number) =>
       this.add
         .image(left + x * bgScale, top + BUTTON_Y * bgScale, key)
         .setDisplaySize(buttonWidth * bgScale, BUTTON_HEIGHT * bgScale);
@@ -87,6 +91,63 @@ export class MainScene extends Phaser.Scene {
     // 버튼 클릭 시 이동할 링크
     this.linkButton(perfectTargetBtn, 'https://youtu.be/wOWJslOeJrQ?si=YM-xU548W6Gc3SRF');
     this.linkButton(stillCuteBtn, 'https://youtu.be/tNLlSWU1uzE?si=HbCAKn26j-TH3Pp7');
+  }
+
+  // 하트 뿅뿅: (x, y)에서 작은 픽셀 하트 여러 개가 위로 떠오르며 사라짐
+  private popHearts(x: number, y: number) {
+    const COUNT = 3; // 한 번에 나오는 하트 개수
+    const RISE = 160; // 떠오르는 높이
+    const DURATION = 1300; // 사라지기까지 걸리는 시간 (1000 = 1초)
+
+    for (let i = 0; i < COUNT; i++) {
+      const heart = this.add
+        .image(x + Phaser.Math.Between(-50, 50), y + Phaser.Math.Between(-20, 20), this.makeHeartTexture())
+        .setDepth(10)
+        .setScale(0);
+      const size = Phaser.Math.FloatBetween(0.8, 1.4);
+      this.tweens.add({ targets: heart, scale: size, duration: 150, delay: i * 60, ease: 'Back.Out' });
+      this.tweens.add({
+        targets: heart,
+        y: heart.y - RISE - Phaser.Math.Between(0, 60),
+        x: heart.x + Phaser.Math.Between(-90, 90),
+        delay: i * 60,
+        duration: DURATION,
+        ease: 'Sine.Out',
+        onComplete: () => heart.destroy(),
+      });
+      // 떠오르는 동안은 또렷하게, 마지막 절반 동안 서서히 사라짐
+      this.tweens.add({ targets: heart, alpha: 0, delay: i * 60 + DURATION / 2, duration: DURATION / 2 });
+    }
+  }
+
+  // 픽셀 하트 그림을 한 번만 만들어 두고 계속 재사용
+  private makeHeartTexture() {
+    const KEY = 'pixelHeart';
+    if (this.textures.exists(KEY)) return KEY;
+
+    const HEART = [
+      '.KK...KK.',
+      'KPPK.KPPK',
+      'KPWPKPPPK',
+      'KPPPPPPPK',
+      '.KPPPPPK.',
+      '..KPPPK..',
+      '...KPK...',
+      '....K....',
+    ];
+    const COLORS: Record<string, number> = { K: 0x1b1430, P: 0xff5fae, W: 0xffffff };
+    const UNIT = 7; // 픽셀 한 칸 크기 (클수록 하트가 커짐)
+
+    const g = this.make.graphics({}, false);
+    HEART.forEach((row, r) =>
+      [...row].forEach((ch, c) => {
+        if (!COLORS[ch]) return;
+        g.fillStyle(COLORS[ch]).fillRect(c * UNIT, r * UNIT, UNIT, UNIT);
+      }),
+    );
+    g.generateTexture(KEY, HEART[0].length * UNIT, HEART.length * UNIT);
+    g.destroy();
+    return KEY;
   }
 
   // 마우스를 올리면 살짝 커지고, 벗어나면 원래대로

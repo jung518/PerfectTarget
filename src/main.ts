@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { MainScene } from './scenes/MainScene';
 import { GameScene } from './scenes/GameScene';
+import { loadFonts } from './fonts';
 
 // 게임 기본 설정 (씬은 직접 만들어서 scene 배열에 추가)
 const config: Phaser.Types.Core.GameConfig = {
@@ -16,4 +17,7 @@ const config: Phaser.Types.Core.GameConfig = {
   scene: [MainScene, GameScene],
 };
 
-new Phaser.Game(config);
+// 픽셀 글꼴을 먼저 불러온 뒤 게임 시작 (글꼴을 못 불러와도 게임은 시작)
+loadFonts()
+  .catch((e) => console.warn('[글꼴 불러오기 실패]', e))
+  .finally(() => new Phaser.Game(config));

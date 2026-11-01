@@ -9,9 +9,32 @@ const NOTE_LENGTH = 0.12; // 음 하나의 길이 (초)
 
 let ctx: AudioContext | null = null;
 
-export function playClickSound() {
+function getContext() {
   if (!ctx) ctx = new AudioContext();
   if (ctx.state === 'suspended') ctx.resume();
+  return ctx;
+}
+
+// 대화 타이핑 효과음: 글자가 나올 때마다 짧고 작은 "톡" 소리 (높이가 조금씩 달라짐)
+const TYPE_VOLUME = 0.06; // 소리 크기 (0 ~ 1)
+const TYPE_LENGTH = 0.04; // 소리 길이 (초)
+
+export function playTypeSound() {
+  const ctx = getContext();
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'triangle'; // 세모 파형 = 부드러운 소리
+  osc.frequency.value = 650 + Math.random() * 200; // 650~850 사이에서 매번 조금씩 다르게
+  gain.gain.setValueAtTime(TYPE_VOLUME, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + TYPE_LENGTH);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + TYPE_LENGTH);
+}
+
+export function playClickSound() {
+  const ctx = getContext();
   const now = ctx.currentTime;
 
   for (const { freq, delay } of NOTES) {
