@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { playClickSound } from '../clickSound';
 import { PIXEL_FONT } from '../fonts';
 
-// 메인 화면: start.png 배경 + 버튼 2개
+// 메인 화면: start_no_text.png 배경 + 버튼 2개
 export class MainScene extends Phaser.Scene {
   constructor() {
     super('Main');
@@ -46,12 +46,12 @@ export class MainScene extends Phaser.Scene {
 
     const { width, height } = this.scale;
 
-    // start.png를 비율 유지한 채 화면 가운데에 맞춤
+    // 배경을 비율 유지한 채 화면 가운데에 맞춤
     const bg = this.add.image(width / 2, height / 2, 'start');
     const bgScale = Math.min(width / bg.width, height / bg.height);
     bg.setScale(bgScale);
 
-    // 버튼 설정 (start.png 원본 1622x970 기준)
+    // 버튼 설정 (배경 원본 1622x970 기준)
     // 두 버튼은 같은 크기로, 화면 가운데를 기준으로 좌우 대칭 배치
     const BUTTON_WIDTH = 400; // 버튼 가로 길이
     const BUTTON_HEIGHT = 130; // 버튼 세로 길이
@@ -60,7 +60,7 @@ export class MainScene extends Phaser.Scene {
     const STILL_CUTE_ANGLE = -0.5; // Still Cute 버튼 기울기 (음수: 시계 반대 방향, 단위: 도)
     const STILL_CUTE_WIDTH = 380; // Still Cute 버튼 가로 길이 (Perfect Target은 BUTTON_WIDTH)
 
-    // start.png 원본 좌표를 화면 좌표로 바꾸기
+    // 배경 원본 좌표를 화면 좌표로 바꾸기
     const left = bg.x - bg.displayWidth / 2;
     const top = bg.y - bg.displayHeight / 2;
     const centerX = bg.width / 2;

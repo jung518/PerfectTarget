@@ -10,7 +10,7 @@ import { loadFonts } from './fonts';
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: 'game',
-  width: 1622, // start.png 크기와 같게
+  width: 1622, // 메인 배경(start_no_text.png) 크기와 같게
   height: 970,
   backgroundColor: '#000000',
   scale: {
