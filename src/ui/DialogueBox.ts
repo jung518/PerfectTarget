@@ -23,10 +23,20 @@ export class DialogueBox {
   private index = 0;
   private fullText = '';
   private isTyping = false;
+  private active = false; // 대화가 진행 중인지
   private onEnd?: () => void;
 
   // x, y: 말풍선 가운데 위치 / name: 이름표에 들어갈 이름
-  constructor(private scene: Phaser.Scene, x: number, y: number, width: number, height: number, name: string) {
+  // tailX: 꼬리 위치 (말풍선 가운데 기준, 음수면 왼쪽으로 이동)
+  constructor(
+    private scene: Phaser.Scene,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    name: string,
+    tailX = 0,
+  ) {
     const left = -width / 2;
     const top = -height / 2;
 
@@ -42,14 +52,14 @@ export class DialogueBox {
     box(1, COLOR.border);
     box(2, COLOR.fill);
 
-    // 말풍선 꼬리 (아래 가운데, 캐릭터 머리 쪽을 가리킴)
+    // 말풍선 꼬리 (아래쪽, 캐릭터 머리 쪽을 가리킴)
     const tailTop = top + height - 3 * P;
     for (let r = 0; r < 9; r++) {
       const half = 9 - r;
       const y = tailTop + r * P;
-      g.fillStyle(COLOR.outline).fillRect(-half * P, y, half * 2 * P, P);
-      if (half > 1) g.fillStyle(COLOR.border).fillRect(-(half - 1) * P, y, (half - 1) * 2 * P, P);
-      if (half > 2) g.fillStyle(COLOR.fill).fillRect(-(half - 2) * P, y, (half - 2) * 2 * P, P);
+      g.fillStyle(COLOR.outline).fillRect(tailX - half * P, y, half * 2 * P, P);
+      if (half > 1) g.fillStyle(COLOR.border).fillRect(tailX - (half - 1) * P, y, (half - 1) * 2 * P, P);
+      if (half > 2) g.fillStyle(COLOR.fill).fillRect(tailX - (half - 2) * P, y, (half - 2) * 2 * P, P);
     }
 
     // 이름표 (왼쪽 위)
@@ -87,7 +97,7 @@ export class DialogueBox {
     scene.tweens.add({ targets: this.arrow, alpha: 0.2, duration: 400, yoyo: true, repeat: -1 });
 
     this.container = scene.add.container(x, y, [g, nameText, this.text, this.arrow]);
-    this.container.setVisible(false);
+    this.container.setVisible(false).setDepth(100).setScrollFactor(0); // 항상 위에, 화면이 움직여도 제자리
   }
 
   // 대사 목록을 처음부터 보여 주기 (다 끝나면 onEnd 실행)
@@ -95,13 +105,15 @@ export class DialogueBox {
     this.lines = lines;
     this.index = 0;
     this.onEnd = onEnd;
+    this.active = true;
+    this.scene.tweens.killTweensOf(this.container);
     this.container.setVisible(true).setAlpha(1);
     this.showLine();
   }
 
   // 화면을 눌렀을 때: 타이핑 중이면 문장을 한 번에 다 보여 주고, 다 나왔으면 다음 대사로
   next() {
-    if (!this.container.visible) return;
+    if (!this.active) return; // 대화가 끝났으면 무시 (끝 처리가 두 번 실행되지 않게)
     if (this.isTyping) {
       this.finishTyping();
       return;
@@ -111,6 +123,7 @@ export class DialogueBox {
       this.showLine();
     } else {
       // 대화 끝: 말풍선 사라짐
+      this.active = false;
       this.scene.tweens.add({
         targets: this.container,
         alpha: 0,

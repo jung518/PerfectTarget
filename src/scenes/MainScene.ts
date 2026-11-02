@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { playClickSound } from '../clickSound';
+import { PIXEL_FONT } from '../fonts';
 
 // 메인 화면: start.png 배경 + 버튼 2개
 export class MainScene extends Phaser.Scene {
@@ -8,14 +9,41 @@ export class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('start', 'assets/images/backgrounds/start_no_text.png');
-    this.load.image('btnPerfectTarget', 'assets/images/items/btn_perfect_target_v2.png');
-    this.load.image('btnStillCute', 'assets/images/items/btn_still_cute_v2.png');
-    this.load.image('startLogo', 'assets/images/items/startbutton.png');
-    this.load.image('yoojung1', 'assets/images/characters/yoojung1.png');
+    this.load.image('start', 'assets/images/main/start_no_text.png');
+    this.load.image('btnPerfectTarget', 'assets/images/main/btn_perfect_target_v2.png');
+    this.load.image('btnStillCute', 'assets/images/main/btn_still_cute_v2.png');
+    this.load.image('startLogo', 'assets/images/main/startbutton.png');
+    this.load.image('yoojung1', 'assets/images/common/yoojung1.png');
+
+    // 다른 화면에서 쓸 이미지도 처음에 미리 불러오기
+    // (화면을 넘길 때마다 서버에서 받으면, 서버가 꺼져 있을 때 배경이 사라짐)
+    this.load.image('background1', 'assets/images/onboarding/background1.jpg');
+    this.load.image('cardgameBackground', 'assets/images/cardgame/cardgame_background.png');
+    this.load.image('cardBack', 'assets/images/cardgame/cardgame_back.png');
+    for (const face of ['frontcard1', 'frontcard2', 'frontcard3', 'frontcard4', 'frontcard6']) {
+      this.load.image(face, `assets/images/cardgame/${face}.png`);
+    }
+    this.load.image('frontcard5', 'assets/images/cardgame/frontcard5_clear.png'); // 검은 모서리를 투명하게 만든 사본
+    this.load.image('perfect', 'assets/images/cardgame/perfect.png');
+    this.load.image('boardBackground', 'assets/images/arrowgame/board_backgound.png');
+    this.load.image('boardYoojung', 'assets/images/arrowgame/board_yoojung.png');
+    this.load.image('roomBackground', 'assets/images/dressup/room_background.png');
+    this.load.image('closetClosed', 'assets/images/dressup/closet_closed.png');
+    this.load.image('closetOpen', 'assets/images/dressup/closet_open.png');
+    this.load.image('dressBase', 'assets/images/dressup/base.png');
+    this.load.image('dressBare', 'assets/images/dressup/base_bare.png');
   }
 
   create() {
+    // 개발용 바로가기: 주소 뒤에 ?scene=DressUp 처럼 붙이면 그 화면부터 시작 (처음 한 번만)
+    // 화면 이름: Game(온보딩), CardGame(카드), RunGame(보드 점프), DressUp(옷 입히기)
+    const jumpTo = new URLSearchParams(location.search).get('scene');
+    if (jumpTo && !this.registry.get('jumped') && this.scene.get(jumpTo)) {
+      this.registry.set('jumped', true);
+      this.scene.start(jumpTo);
+      return;
+    }
+
     const { width, height } = this.scale;
 
     // start.png를 비율 유지한 채 화면 가운데에 맞춤
@@ -91,6 +119,16 @@ export class MainScene extends Phaser.Scene {
     // 버튼 클릭 시 이동할 링크
     this.linkButton(perfectTargetBtn, 'https://youtu.be/wOWJslOeJrQ?si=YM-xU548W6Gc3SRF');
     this.linkButton(stillCuteBtn, 'https://youtu.be/tNLlSWU1uzE?si=HbCAKn26j-TH3Pp7');
+
+    // 저작권 안내 (맨 아래 가운데, 작고 흐리게)
+    this.add
+      .text(left + centerX * bgScale, top + 950 * bgScale, '사용된 이미지·콘셉트의 저작권은 판타지오 및 원저작자에게 있습니다.', {
+        fontFamily: `${PIXEL_FONT}, sans-serif`,
+        fontSize: '22px',
+        color: '#ffffff',
+      })
+      .setOrigin(0.5, 1)
+      .setAlpha(0.6); // 흐린 정도 (0 = 안 보임, 1 = 선명)
   }
 
   // 하트 뿅뿅: (x, y)에서 작은 픽셀 하트 여러 개가 위로 떠오르며 사라짐
