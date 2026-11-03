@@ -31,7 +31,6 @@ export class MainScene extends Phaser.Scene {
     this.load.image('closetClosed', 'assets/images/dressup/closet_closed.png');
     this.load.image('closetOpen', 'assets/images/dressup/closet_open.png');
     this.load.image('dressBase', 'assets/images/dressup/base.png');
-    this.load.image('dressBare', 'assets/images/dressup/base_bare.png');
   }
 
   create() {

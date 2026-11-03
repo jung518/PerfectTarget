@@ -141,3 +141,43 @@ export function playPickSound() {
     osc.stop(t + PICK_LENGTH);
   });
 }
+
+// 사진 찍기 카운트다운 "삑" (3, 2, 1)
+export function playCountSound() {
+  const ctx = getContext();
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'square';
+  osc.frequency.value = 880;
+  gain.gain.setValueAtTime(0.08, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + 0.08);
+}
+
+// 카메라 셔터 "찰칵": 짧은 잡음 두 번
+const SHUTTER_VOLUME = 0.5; // 소리 크기 (0 ~ 1)
+
+export function playShutterSound() {
+  const ctx = getContext();
+  const clicks = [
+    { delay: 0, length: 0.05, volume: SHUTTER_VOLUME, pitch: 2500 }, // "찰"
+    { delay: 0.07, length: 0.08, volume: SHUTTER_VOLUME * 0.7, pitch: 1500 }, // "칵"
+  ];
+  for (const { delay, length, volume, pitch } of clicks) {
+    const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * length), ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+    const src = ctx.createBufferSource();
+    const filter = ctx.createBiquadFilter();
+    const gain = ctx.createGain();
+    src.buffer = buffer;
+    filter.type = 'highpass'; // 높은 소리만 남겨서 "찰칵" 느낌
+    filter.frequency.value = pitch;
+    gain.gain.value = volume;
+    src.connect(filter).connect(gain).connect(ctx.destination);
+    src.start(ctx.currentTime + delay);
+  }
+}
