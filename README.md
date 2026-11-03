@@ -44,3 +44,4 @@ src/ui/          말풍선, 캐릭터, 뒤로 가기 버튼 등 공통 부품
 - 게임에 쓰인 이미지는 ChatGPT로 만들었고, 캐릭터와 콘셉트의 저작권은 **판타지오 및 원저작자**에게 있습니다.
 - 이미지는 이 프로젝트 안에서만 사용하며, 다른 곳에 복사하거나 다시 배포하지 말아 주세요.
 - 픽셀 글꼴 [Galmuri](https://github.com/quiple/galmuri)는 SIL Open Font License 1.1을 따라요.
+- 파비콘 해바라기 그림은 [Twemoji](https://github.com/jdecked/twemoji)(CC BY 4.0)를 사용했어요.
