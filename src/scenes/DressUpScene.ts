@@ -90,6 +90,7 @@ export class DressUpScene extends Phaser.Scene {
   private items: Phaser.GameObjects.Image[] = [];
   private picked: Partial<Record<Category, Cloth>> = {};
   private lookTexture = 'dressBase'; // 지금 입은 코디 그림 (사진에 들어감)
+  private photoFile?: File; // 저장·공유할 사진 파일
   private closetReady = false; // true면 옷장을 눌러 열 수 있음
 
   constructor() {
@@ -402,21 +403,35 @@ export class DressUpScene extends Phaser.Scene {
     return canvas;
   }
 
-  // 사진을 파일로 내려받기
+  // 사진 저장하기 (휴대폰은 공유 창, 컴퓨터는 파일로 저장)
   private savePhoto(canvas: HTMLCanvasElement) {
-    canvas.toBlob((blob) => {
-      if (!blob) return;
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = PHOTO_FILE_NAME;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    });
+    const file = this.photoFile;
+    // 휴대폰: 공유 창 열기 (아이폰은 "이미지 저장"으로 사진 앱에 바로 저장, 카톡·인스타로 보내기도 가능)
+    const isPhone = navigator.maxTouchPoints > 0 && window.matchMedia('(pointer: coarse)').matches;
+    if (isPhone && file && navigator.canShare?.({ files: [file] })) {
+      navigator.share({ files: [file] }).catch((e: DOMException) => {
+        if (e.name !== 'AbortError') this.downloadPhoto(canvas); // 공유가 안 되면 파일로 저장 (그냥 닫은 건 제외)
+      });
+      return;
+    }
+    // 컴퓨터: 파일로 저장
+    this.downloadPhoto(canvas);
+  }
+
+  private downloadPhoto(canvas: HTMLCanvasElement) {
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = PHOTO_FILE_NAME;
+    a.click();
   }
 
   // THE END + 사진 저장하기 / 메인으로 버튼 (사진 오른쪽)
   private showTheEnd(photo: HTMLCanvasElement) {
+    // 공유 창은 버튼을 누른 순간 바로 열어야 해서, 사진 파일을 미리 만들어 둠
+    this.photoFile = undefined;
+    photo.toBlob((blob) => {
+      if (blob) this.photoFile = new File([blob], PHOTO_FILE_NAME, { type: 'image/png' });
+    });
     const title = this.add
       .text(END_X, 330, 'THE END', {
         fontFamily: `${PIXEL_FONT}, sans-serif`,
