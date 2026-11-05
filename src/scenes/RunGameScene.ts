@@ -10,7 +10,7 @@ import { PIXEL_FONT } from '../fonts';
 // 대사 (한 줄 = 말풍선 한 번)
 const INTRO_GUIDE = [
   '두 번째 게임은 보드를 타고 끝까지 완주하는 게임이야!',
-  '점프 버튼을 클릭하면 1번 점프!\n더블 클릭하면 공중제비 돌기 까쥐~!',
+  '화면을 터치하면 1번 점프!\n빠르게 두 번 터치하면 공중제비 돌기 까쥐~!',
   '구멍에 빠지지 말고 끝까지 완주해 봐!',
 ];
 const RETRY_GUIDE = ['앗, 떨어졌어!', '집중해 집쭝!!!\n 기회를 한 번 더 줄게'];
@@ -27,7 +27,8 @@ const SPEED_UP = 22; // 1초마다 빨라지는 정도 (시간이 지날수록 �
 const SPEED_MAX = 1000; // 최고 속도
 const GRAVITY = 2600; // 떨어지는 힘
 const JUMP_POWER = 950; // 첫 번째 점프 힘
-const DOUBLE_JUMP_POWER = 1050; // 공중에서 한 번 더 누를 때 점프 힘 (더 높이)
+const DOUBLE_JUMP_POWER = 1050; // 더블 클릭 때 점프 힘 (공중돌기하며 더 높이)
+const DOUBLE_TAP_TIME = 300; // 이 시간(밀리초) 안에 두 번 누르면 더블 클릭으로 봄
 
 // 코스: [땅 길이, 그 뒤 구멍 폭] — 구멍이 넓을수록 점프 타이밍이 빠듯함
 // 뒤로 갈수록 구멍은 넓어지고 땅은 짧아짐 (속도도 빨라지니 점점 어려워짐)
@@ -77,6 +78,7 @@ export class RunGameScene extends Phaser.Scene {
   private speed = SPEED_START;
   private jumps = 0; // 공중에서 쓴 점프 횟수 (최대 2)
   private onGround = true;
+  private jumpTime = 0; // 마지막으로 땅에서 점프한 시각 (더블 클릭 판단용)
   private falling = false; // 구멍에 빠지는 중
   private running = false; // 달리는 중인지 (설명 중에는 멈춤)
 
@@ -120,7 +122,10 @@ export class RunGameScene extends Phaser.Scene {
     // 화면 위 고정 UI
     addBackButton(this, 'CardGame'); // 누르면 카드 짝 맞추기 게임으로
     this.drawProgressBar();
-    this.addJumpButton();
+    // 화면 아무 곳이나 누르면 점프 (BACK 버튼을 누른 경우는 제외)
+    this.input.on('pointerdown', (_p: Phaser.Input.Pointer, over: Phaser.GameObjects.GameObject[]) => {
+      if (over.length === 0) this.jump();
+    });
     // PC에서는 스페이스바로도 점프 (꾹 누르고 있어도 한 번만)
     this.input.keyboard?.on('keydown-SPACE', (e: KeyboardEvent) => {
       if (!e.repeat) this.jump();
@@ -201,36 +206,17 @@ export class RunGameScene extends Phaser.Scene {
   }
 
   // 점프 버튼 (오른쪽 아래, 분홍 픽셀 버튼)
-  private addJumpButton() {
-    const W = 260;
-    const H = 120;
-    const P = 6;
-    const btn = this.add.container(this.scale.width - 60 - W / 2, this.scale.height - 50 - H / 2).setDepth(80).setScrollFactor(0);
-    const g = this.add.graphics();
-    g.fillStyle(0x1b1430).fillRect(-W / 2 + P, -H / 2, W - 2 * P, H).fillRect(-W / 2, -H / 2 + P, W, H - 2 * P);
-    g.fillStyle(0xff6fb5).fillRect(-W / 2 + 2 * P, -H / 2 + P, W - 4 * P, H - 2 * P).fillRect(-W / 2 + P, -H / 2 + 2 * P, W - 2 * P, H - 4 * P);
-    g.fillStyle(0xffb3da).fillRect(-W / 2 + 2 * P, -H / 2 + P, W - 4 * P, P);
-    g.fillStyle(0xd63c8a).fillRect(-W / 2 + 2 * P, H / 2 - 2 * P, W - 4 * P, P);
-    const label = this.add
-      .text(0, 0, 'JUMP', { fontFamily: `${PIXEL_FONT}, sans-serif`, fontSize: '55px', fontStyle: 'bold', color: '#ffffff', stroke: '#8a1f55', strokeThickness: 8 })
-      .setOrigin(0.5);
-    btn.add([g, label]);
-    btn.setSize(W, H).setInteractive({ useHandCursor: true });
-    btn.on('pointerdown', () => {
-      this.jump();
-      this.tweens.add({ targets: btn, scale: 0.92, duration: 60, yoyo: true });
-    });
-  }
-
-  // 점프: 땅 위면 점프, 공중이면 한 번 더 (더 높이)
+  // 점프: 한 번 누르면 점프, 빠르게 두 번 누르면(더블 클릭) 공중돌기하며 더 높이
+  // 점프한 뒤 시간이 지나서 공중에서 누른 건 무시 (실수로 공중돌기가 나가지 않게)
   private jump() {
     if (!this.running || this.falling) return;
     if (this.onGround) {
       this.vy = -JUMP_POWER;
       this.jumps = 1;
       this.onGround = false;
+      this.jumpTime = this.time.now;
       playJumpSound();
-    } else if (this.jumps < 2) {
+    } else if (this.jumps === 1 && this.time.now - this.jumpTime <= DOUBLE_TAP_TIME) {
       this.vy = -DOUBLE_JUMP_POWER;
       this.jumps = 2;
       playJumpSound(true);
