@@ -5,6 +5,10 @@ import { CardGameScene } from './scenes/CardGameScene';
 import { RunGameScene } from './scenes/RunGameScene';
 import { DressUpScene } from './scenes/DressUpScene';
 import { loadFonts } from './fonts';
+import { inject } from '@vercel/analytics';
+
+// 방문자 수 세기 (Vercel 대시보드의 Analytics 탭에서 확인, 배포된 사이트에서만 집계됨)
+inject();
 
 // 게임 기본 설정 (씬은 직접 만들어서 scene 배열에 추가)
 const config: Phaser.Types.Core.GameConfig = {
