@@ -23,7 +23,7 @@
 - [Phaser 3](https://phaser.io/) + TypeScript + Vite
 - 효과음은 별도 파일 없이 코드(Web Audio API)로 구현했습니다.
 
-## 다국어 지원 🌏
+## 다국어 지원 
 
 글로벌 팬들도 즐길 수 있도록 **한국어 · English · 日本語**를 지원해요.
 
