@@ -1,0 +1,53 @@
+{
+  "common": {
+    "characterName": "Yoojung",
+    "back": "◀ BACK"
+  },
+  "main": {
+    "copyright": "All images and concepts used belong to Fantagio and their original creators."
+  },
+  "onboarding": {
+    "lines": [
+      "Hi! I'm Yoojung.",
+      "Tap anywhere on the screen to continue the conversation.",
+      "I'll show you how to play each game, one by one.\nFollow along!",
+      "Ready? Let's go!"
+    ]
+  },
+  "cardGame": {
+    "round1": [
+      "The first game is card matching!",
+      "Flip two cards at a time.\nFind the same picture to make a pair.",
+      "I'll show you the cards for a moment first.\nRemember them well!",
+      "Shall we start?"
+    ],
+    "round2": [
+      "Round 1 clear! That was easy, right?",
+      "In round 2, there are {{count}} cards.",
+      "I'll show them to you first again,\nso focus and remember!"
+    ],
+    "retry": [
+      "Oops, time's up!",
+      "I'll give you one more chance.\nGood luck this time~.."
+    ]
+  },
+  "runGame": {
+    "intro": [
+      "The second game is riding a board all the way to the finish!",
+      "Tap the screen to jump!\nTap twice quickly to do a flip, wheee~!",
+      "Don't fall into the holes. Make it to the end!"
+    ],
+    "retry": ["Oops, you fell!", "Focus, focus!!!\nI'll give you one more chance"],
+    "clear": ["You made it!"]
+  },
+  "dressUp": {
+    "intro": [
+      "The last game is dressing up Yoojung!",
+      "Pick a top, bottom, and shoes from the closet\nto make a cute and stylish Yoojung!"
+    ],
+    "ending": ["Ta-da! How do I look?", "I love today's outfit!\nShall we take a photo together?"],
+    "takePhoto": "Take Photo",
+    "savePhoto": "Save Photo",
+    "toMain": "Main Menu"
+  }
+}

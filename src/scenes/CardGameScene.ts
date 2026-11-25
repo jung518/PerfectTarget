@@ -3,27 +3,16 @@ import { DialogueBox } from '../ui/DialogueBox';
 import { addBackButton } from '../ui/backButton';
 import { createGuideDialogue, showGuide } from '../ui/guide';
 import { playClearSound, playMatchSound } from '../clickSound';
+import { t } from '../i18n';
 
 // ───────── 설정 ─────────
 // (캐릭터·말풍선 위치와 배경 흐림 정도는 src/ui/guide.ts에서 바꿈)
 
-// 대사 (한 줄 = 말풍선 한 번)
-const ROUND1_GUIDE = [
-  '첫 번째 게임은 카드 짝 맞추기야!',
-  '카드를 두 장씩 뒤집어서\n같은 그림을 찾으면 짝이 맞춰져.',
-  '처음에 카드를 잠깐 보여 줄게.\n잘 기억해 둬!',
-  '그럼 시작해 볼까?',
-];
-const ROUND2_GUIDE = [
-  '1라운드 클리어! 완전 쉽지?',
-  '2라운드는 카드가 12장으로 늘어나.',
-  '이번에도 처음에 잠깐 보여 줄 테니까\n집중해서 기억해 봐!',
-];
-// 시간이 다 됐을 때 (다시 도전)
-const RETRY_GUIDE = [
-  '앗, 시간이 다 됐어!',
-  '아쉬우니까 기회를 한 번 더 줄게.\n이번엔 꼭 성공하길~..',
-];
+// 대사는 src/i18n/locales/*.json의 cardGame (한 줄 = 말풍선 한 번)
+// 함수로 만든 이유: 언어를 바꾼 뒤에도 부를 때마다 현재 언어로 가져오려고
+const ROUND1_GUIDE = () => t('cardGame.round1', { returnObjects: true });
+const ROUND2_GUIDE = () => t('cardGame.round2', { returnObjects: true, count: ROUNDS[1].faces.length * 2 }); // {{count}} = 2라운드 카드 장수
+const RETRY_GUIDE = () => t('cardGame.retry', { returnObjects: true }); // 시간이 다 됐을 때 (다시 도전)
 
 // 시간 막대 (화면 위쪽 가운데)
 const TIMER_X = 811; // 막대 가운데 가로 위치
@@ -125,7 +114,7 @@ export class CardGameScene extends Phaser.Scene {
     this.dialogue = createGuideDialogue(this);
 
     // 1라운드 설명 → 1라운드 시작
-    this.showGuide(ROUND1_GUIDE, () => this.startRound(0));
+    this.showGuide(ROUND1_GUIDE(), () => this.startRound(0));
   }
 
   // 매 화면마다: 남은 시간에 맞춰 시간 막대 줄이기
@@ -184,7 +173,7 @@ export class CardGameScene extends Phaser.Scene {
       onComplete: () => {
         this.cards.forEach((c) => c.destroy());
         this.cards = [];
-        this.showGuide(RETRY_GUIDE, () => this.startRound(roundIndex));
+        this.showGuide(RETRY_GUIDE(), () => this.startRound(roundIndex));
       },
     });
   }
@@ -309,7 +298,7 @@ export class CardGameScene extends Phaser.Scene {
         this.cards = [];
         if (roundIndex === 0) {
           // 2라운드 설명 → 2라운드 시작
-          this.showGuide(ROUND2_GUIDE, () => this.startRound(1));
+          this.showGuide(ROUND2_GUIDE(), () => this.startRound(1));
         } else {
           // 2라운드까지 클리어: PERFECT!
           this.showPerfect();

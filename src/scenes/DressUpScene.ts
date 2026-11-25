@@ -3,13 +3,14 @@ import { DialogueBox } from '../ui/DialogueBox';
 import { addCharacter } from '../ui/character';
 import { addBackButton } from '../ui/backButton';
 import { playClickSound, playClearSound, playPickSound, playCountSound, playShutterSound } from '../clickSound';
-import { PIXEL_FONT } from '../fonts';
+import { PIXEL_FONT_STACK } from '../fonts';
+import { t } from '../i18n';
 
 // ───────── 설정 ─────────
 
 // 대사 (한 줄 = 말풍선 한 번)
-const INTRO_GUIDE = ['마지막 게임은 유댕이 꾸미기야!', '옷장에서 상의, 하의, 신발을 골라서\n귀엽고 멋진 유정이를 완성해 줘!'];
-const ENDING_GUIDE = ['짜잔! 어때, 잘 어울려?', '오늘 코디 너무 마음에 들어!\n우리 기념사진 한 장 찍을까?'];
+const INTRO_GUIDE = () => t('dressUp.intro', { returnObjects: true }); // 문구는 src/i18n/locales/*.json의 dressUp
+const ENDING_GUIDE = () => t('dressUp.ending', { returnObjects: true });
 
 // 유정 (방 가운데쯤 서 있음)
 const CHAR_X = 560; // 가운데 가로 위치
@@ -137,7 +138,7 @@ export class DressUpScene extends Phaser.Scene {
 
     // 말풍선 (꼬리가 유정 머리를 가리킴)
     const BUBBLE_X = 760;
-    this.dialogue = new DialogueBox(this, BUBBLE_X, 210, 1000, 260, '유정', CHAR_X - BUBBLE_X);
+    this.dialogue = new DialogueBox(this, BUBBLE_X, 210, 1000, 260, t('common.characterName'), CHAR_X - BUBBLE_X);
     this.input.on('pointerdown', (_p: Phaser.Input.Pointer, over: Phaser.GameObjects.GameObject[]) => {
       if (over.length === 0) this.dialogue.next();
     });
@@ -147,7 +148,7 @@ export class DressUpScene extends Phaser.Scene {
     this.closet.on('pointerdown', () => this.openCloset());
 
     // 설명이 끝나면 옷장이 통통 튀며 "눌러 줘" 신호
-    this.dialogue.start(INTRO_GUIDE, () => {
+    this.dialogue.start(INTRO_GUIDE(), () => {
       this.closetReady = true;
       this.tweens.add({ targets: this.closet, y: this.closet.y - 12, duration: 350, yoyo: true, repeat: -1, ease: 'Sine.InOut' });
     });
@@ -279,12 +280,12 @@ export class DressUpScene extends Phaser.Scene {
     this.cameras.main.flash(250, 255, 255, 255);
     this.popHearts(CHAR_X, CHAR_BOTTOM - CHAR_HEIGHT * 0.6);
 
-    this.time.delayedCall(1200, () => this.dialogue.start(ENDING_GUIDE, () => this.showShotButton()));
+    this.time.delayedCall(1200, () => this.dialogue.start(ENDING_GUIDE(), () => this.showShotButton()));
   }
 
   // 사진 찍기 버튼: 누르면 버튼이 사라지고 사진 찍기 시작
   private showShotButton() {
-    const btn = this.pixelButton(SHOT_BUTTON_X, SHOT_BUTTON_Y, '사진 찍기', () => {
+    const btn = this.pixelButton(SHOT_BUTTON_X, SHOT_BUTTON_Y, t('dressUp.takePhoto'), () => {
       btn.disableInteractive();
       this.tweens.killTweensOf(btn);
       this.tweens.add({ targets: btn, alpha: 0, scale: 0.8, duration: 200, onComplete: () => btn.destroy() });
@@ -309,7 +310,7 @@ export class DressUpScene extends Phaser.Scene {
     frame.strokePoints([{ x: L, y: B - C }, { x: L, y: B }, { x: L + C, y: B }]);
     frame.strokePoints([{ x: R - C, y: B }, { x: R, y: B }, { x: R, y: B - C }]);
     const rec = this.add
-      .text(L + 24, T + 18, '● REC', { fontFamily: `${PIXEL_FONT}, sans-serif`, fontSize: '33px', fontStyle: 'bold', color: '#ff4d4d' })
+      .text(L + 24, T + 18, '● REC', { fontFamily: PIXEL_FONT_STACK, fontSize: '33px', fontStyle: 'bold', color: '#ff4d4d' })
       .setDepth(150)
       .setAlpha(0);
     this.tweens.add({ targets: [frame, rec], alpha: 1, duration: 250 });
@@ -320,7 +321,7 @@ export class DressUpScene extends Phaser.Scene {
       this.time.delayedCall(500 + i * 600, () => {
         playCountSound();
         const t = this.add
-          .text(R - 110, T + 80, n, { fontFamily: `${PIXEL_FONT}, sans-serif`, fontSize: '110px', fontStyle: 'bold', color: '#ffffff', stroke: '#ff3d9a', strokeThickness: 12 })
+          .text(R - 110, T + 80, n, { fontFamily: PIXEL_FONT_STACK, fontSize: '110px', fontStyle: 'bold', color: '#ffffff', stroke: '#ff3d9a', strokeThickness: 12 })
           .setOrigin(0.5)
           .setDepth(151)
           .setScale(0.3);
@@ -393,7 +394,7 @@ export class DressUpScene extends Phaser.Scene {
     // 날짜 (옛날 필름 카메라처럼 주황색)
     const d = new Date();
     const pad = (n: number) => String(n).padStart(2, '0');
-    ctx.font = `22px ${PIXEL_FONT}`;
+    ctx.font = `22px ${PIXEL_FONT_STACK}`;
     ctx.textAlign = 'right';
     ctx.fillStyle = '#ff9b3d';
     ctx.shadowColor = '#ff6a00';
@@ -434,7 +435,7 @@ export class DressUpScene extends Phaser.Scene {
     });
     const title = this.add
       .text(END_X, 330, 'THE END', {
-        fontFamily: `${PIXEL_FONT}, sans-serif`,
+        fontFamily: PIXEL_FONT_STACK,
         fontSize: '132px',
         fontStyle: 'bold',
         color: '#ffffff',
@@ -447,8 +448,8 @@ export class DressUpScene extends Phaser.Scene {
       .setScale(0);
     this.tweens.add({ targets: title, scale: 1, duration: 600, ease: 'Back.Out' });
 
-    const saveBtn = this.pixelButton(END_X, 520, '사진 저장하기', () => this.savePhoto(photo));
-    const mainBtn = this.pixelButton(END_X, 650, '메인으로', () => this.scene.start('Main'));
+    const saveBtn = this.pixelButton(END_X, 520, t('dressUp.savePhoto'), () => this.savePhoto(photo));
+    const mainBtn = this.pixelButton(END_X, 650, t('dressUp.toMain'), () => this.scene.start('Main'));
     this.tweens.add({ targets: [saveBtn, mainBtn], alpha: 1, duration: 400, delay: 700 });
   }
 
@@ -464,7 +465,7 @@ export class DressUpScene extends Phaser.Scene {
     g.fillStyle(0xffb3da).fillRect(-W / 2 + 2 * P, -H / 2 + P, W - 4 * P, P);
     g.fillStyle(0xd63c8a).fillRect(-W / 2 + 2 * P, H / 2 - 2 * P, W - 4 * P, P);
     const label = this.add
-      .text(0, 0, text, { fontFamily: `${PIXEL_FONT}, sans-serif`, fontSize: '44px', fontStyle: 'bold', color: '#ffffff', stroke: '#8a1f55', strokeThickness: 8 })
+      .text(0, 0, text, { fontFamily: PIXEL_FONT_STACK, fontSize: '44px', fontStyle: 'bold', color: '#ffffff', stroke: '#8a1f55', strokeThickness: 8 })
       .setOrigin(0.5);
     btn.add([g, label]);
     btn.setSize(W, H).setInteractive({ useHandCursor: true });

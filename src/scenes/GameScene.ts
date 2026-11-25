@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { DialogueBox } from '../ui/DialogueBox';
 import { addCharacter } from '../ui/character';
 import { addBackButton } from '../ui/backButton';
+import { t } from '../i18n';
 
 // 게임 화면 (GAME START를 누르면 이동하는 화면)
 export class GameScene extends Phaser.Scene {
@@ -46,15 +47,10 @@ export class GameScene extends Phaser.Scene {
     addCharacter(this, 'yoojung1', CHAR_X, CHAR_BOTTOM, CHAR_HEIGHT); // 흰 테두리 + 발밑 그림자 포함
 
     // 말풍선 (캐릭터 머리 위)
-    const dialogue = new DialogueBox(this, CHAR_X, 290, 1000, 260, '유정');
+    const dialogue = new DialogueBox(this, CHAR_X, 290, 1000, 260, t('common.characterName'));
 
-    // 튜토리얼 대사 (한 줄 = 말풍선 한 번)
-    const TUTORIAL_LINES = [
-      '안녕! 나는 유정이야.',
-      '대화는 화면 아무 곳이나 누르면 다음으로 넘어가.',
-      '앞으로 게임 방법을 하나씩 알려 줄게.\n잘 따라와 줘!',
-      '그럼, 시작해 볼까?',
-    ];
+    // 튜토리얼 대사 (한 줄 = 말풍선 한 번, 문구는 src/i18n/locales/*.json의 onboarding.lines)
+    const TUTORIAL_LINES = t('onboarding.lines', { returnObjects: true });
     // 대화가 끝나면 잠깐 뒤 카드 게임 화면으로 자동 이동
     dialogue.start(TUTORIAL_LINES, () => this.time.delayedCall(400, () => this.scene.start('CardGame')));
 

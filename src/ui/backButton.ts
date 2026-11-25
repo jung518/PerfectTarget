@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { t } from '../i18n';
 
 // 뒤로 가기 버튼 (분홍색 픽셀 버튼, 왼쪽 위)
 // target: 누르면 이동할 화면 이름 (예: 'Main')
@@ -18,7 +19,7 @@ export function addBackButton(scene: Phaser.Scene, target: string) {
   g.fillStyle(0xd63c8a).fillRect(-W / 2 + 2 * P, H / 2 - 2 * P, W - 4 * P, P);
 
   // 글자 (아래에 진한 분홍 그림자)
-  const label = scene.add.text(0, 0, '◀ BACK', {
+  const label = scene.add.text(0, 0, t('common.back'), {
     fontFamily: 'monospace',
     fontSize: '38px',
     fontStyle: 'bold',

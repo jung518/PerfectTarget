@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { DialogueBox } from './DialogueBox';
 import { addCharacter } from './character';
+import { t } from '../i18n';
 
 // 게임 화면에서 캐릭터가 나와 설명하는 공통 기능
 // 캐릭터는 화면 왼쪽, 말풍선은 오른쪽 위 (꼬리가 캐릭터 머리를 가리킴)
@@ -13,7 +14,7 @@ const BLUR_STRENGTH = 1.5; // 설명하는 동안 배경 흐린 정도
 
 // 말풍선 만들기 + 화면을 누르면 다음 대사로 (버튼·카드처럼 누를 수 있는 걸 누른 경우는 제외)
 export function createGuideDialogue(scene: Phaser.Scene) {
-  const dialogue = new DialogueBox(scene, BUBBLE_X, 290, 1000, 260, '유정', CHAR_X - BUBBLE_X + 40);
+  const dialogue = new DialogueBox(scene, BUBBLE_X, 290, 1000, 260, t('common.characterName'), CHAR_X - BUBBLE_X + 40);
   scene.input.on('pointerdown', (_pointer: Phaser.Input.Pointer, over: Phaser.GameObjects.GameObject[]) => {
     if (over.length === 0) dialogue.next();
   });

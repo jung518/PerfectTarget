@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import './i18n'; // 다국어 설정 (씬보다 먼저 불러와야 함)
 import { MainScene } from './scenes/MainScene';
 import { GameScene } from './scenes/GameScene';
 import { CardGameScene } from './scenes/CardGameScene';

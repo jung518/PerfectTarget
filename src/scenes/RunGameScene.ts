@@ -3,18 +3,15 @@ import { DialogueBox } from '../ui/DialogueBox';
 import { addBackButton } from '../ui/backButton';
 import { createGuideDialogue, showGuide } from '../ui/guide';
 import { playJumpSound } from '../clickSound';
-import { PIXEL_FONT } from '../fonts';
+import { PIXEL_FONT_STACK } from '../fonts';
+import { t } from '../i18n';
 
 // ───────── 설정 ─────────
 
-// 대사 (한 줄 = 말풍선 한 번)
-const INTRO_GUIDE = [
-  '두 번째 게임은 보드를 타고 끝까지 완주하는 게임이야!',
-  '화면을 터치하면 1번 점프!\n빠르게 두 번 터치하면 공중제비 돌기 까쥐~!',
-  '구멍에 빠지지 말고 끝까지 완주해 봐!',
-];
-const RETRY_GUIDE = ['앗, 떨어졌어!', '집중해 집쭝!!!\n 기회를 한 번 더 줄게'];
-const CLEAR_GUIDE = ['완주 성공!'];
+// 대사는 src/i18n/locales/*.json의 runGame (한 줄 = 말풍선 한 번)
+const INTRO_GUIDE = () => t('runGame.intro', { returnObjects: true });
+const RETRY_GUIDE = () => t('runGame.retry', { returnObjects: true });
+const CLEAR_GUIDE = () => t('runGame.clear', { returnObjects: true });
 
 // 화면과 땅
 const GROUND_Y = 705; // 땅 윗면 높이 (배경 그림의 땅 높이와 같게)
@@ -135,7 +132,7 @@ export class RunGameScene extends Phaser.Scene {
     // 설명하는 동안에는 보드 유정이 왼쪽에서 말하고, 달리는 캐릭터는 숨겨 둠
     this.player.setAlpha(0);
     this.dialogue = createGuideDialogue(this);
-    showGuide(this, this.bg, this.dialogue, data?.retry ? RETRY_GUIDE : INTRO_GUIDE, () => this.startRunning(), 'boardYoojung');
+    showGuide(this, this.bg, this.dialogue, data?.retry ? RETRY_GUIDE() : INTRO_GUIDE(), () => this.startRunning(), 'boardYoojung');
   }
 
   // 달리는 캐릭터가 나타나고 출발
@@ -200,7 +197,7 @@ export class RunGameScene extends Phaser.Scene {
       }
     }
     this.add
-      .text(this.finishX, GROUND_Y - 290, 'GOAL', { fontFamily: `${PIXEL_FONT}, sans-serif`, fontSize: '44px', color: '#ffffff', stroke: '#1b1430', strokeThickness: 8 })
+      .text(this.finishX, GROUND_Y - 290, 'GOAL', { fontFamily: PIXEL_FONT_STACK, fontSize: '44px', color: '#ffffff', stroke: '#1b1430', strokeThickness: 8 })
       .setOrigin(0.5)
       .setDepth(4);
   }
@@ -236,7 +233,7 @@ export class RunGameScene extends Phaser.Scene {
     g.fillStyle(0x1b1430).fillRect(left + P, top, W - 2 * P, H).fillRect(left, top + P, W, H - 2 * P);
     g.fillStyle(0xffffff).fillRect(left + P, top + P, W - 2 * P, H - 2 * P);
     this.add
-      .text(left + W + 16, top + H / 2, 'GOAL', { fontFamily: `${PIXEL_FONT}, sans-serif`, fontSize: '33px', color: '#ffffff', stroke: '#1b1430', strokeThickness: 6 })
+      .text(left + W + 16, top + H / 2, 'GOAL', { fontFamily: PIXEL_FONT_STACK, fontSize: '33px', color: '#ffffff', stroke: '#1b1430', strokeThickness: 6 })
       .setOrigin(0, 0.5)
       .setDepth(80)
       .setScrollFactor(0);
@@ -313,7 +310,7 @@ export class RunGameScene extends Phaser.Scene {
     this.tweens.killTweensOf(h);
     this.tweens.add({ targets: h, scale: 1.8, alpha: 0, y: h.y - 40, duration: 300, onComplete: () => h.destroy() });
     const text = this.add
-      .text(h.x, h.y - 30, 'PERFECT!', { fontFamily: `${PIXEL_FONT}, sans-serif`, fontSize: '33px', color: '#ffffff', stroke: '#ff3d9a', strokeThickness: 6 })
+      .text(h.x, h.y - 30, 'PERFECT!', { fontFamily: PIXEL_FONT_STACK, fontSize: '33px', color: '#ffffff', stroke: '#ff3d9a', strokeThickness: 6 })
       .setOrigin(0.5)
       .setDepth(20);
     this.tweens.add({ targets: text, y: text.y - 60, alpha: 0, duration: 700, onComplete: () => text.destroy() });
@@ -336,7 +333,7 @@ export class RunGameScene extends Phaser.Scene {
       onComplete: () => {
         this.player.setAlpha(0); // 설명하는 보드 유정과 겹치지 않게
         // 완주 대사가 끝나면 마지막 순서(옷 입히기)로
-        showGuide(this, this.bg, this.dialogue, CLEAR_GUIDE, () => this.goDressUp(), 'boardYoojung');
+        showGuide(this, this.bg, this.dialogue, CLEAR_GUIDE(), () => this.goDressUp(), 'boardYoojung');
       },
     });
   }

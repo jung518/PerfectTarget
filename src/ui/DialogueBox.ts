@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { playTypeSound } from '../clickSound';
-import { PIXEL_FONT } from '../fonts';
+import { PIXEL_FONT_STACK } from '../fonts';
 
 // NPC 대화 말풍선: 대사를 한 글자씩 타이핑하듯 보여 주고, 누르면 다음 대사로 넘어감
 
@@ -71,7 +71,7 @@ export class DialogueBox {
     g.fillStyle(COLOR.border).fillRect(tagX + P, tagY + P, tagW - 2 * P, tagH - 2 * P);
     const nameText = scene.add
       .text(tagX + tagW / 2, tagY + tagH / 2, name, {
-        fontFamily: `${PIXEL_FONT}, sans-serif`,
+        fontFamily: PIXEL_FONT_STACK,
         fontSize: '33px',
         fontStyle: 'bold',
         color: '#ffffff',
@@ -82,7 +82,7 @@ export class DialogueBox {
 
     // 대사 글자
     this.text = scene.add.text(left + PADDING, top + PADDING, '', {
-      fontFamily: `${PIXEL_FONT}, sans-serif`, // 레트로 픽셀 글꼴
+      fontFamily: PIXEL_FONT_STACK, // 레트로 픽셀 글꼴
       fontSize: '44px', // 11의 배수일 때 가장 또렷함
       color: COLOR.text,
       lineSpacing: 12,

@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { playClickSound } from '../clickSound';
-import { PIXEL_FONT } from '../fonts';
+import { PIXEL_FONT_STACK } from '../fonts';
+import { t } from '../i18n';
+import { addLanguageButton } from '../ui/languageButton';
 
 // 메인 화면: start_no_text.png 배경 + 버튼 2개
 export class MainScene extends Phaser.Scene {
@@ -119,10 +121,13 @@ export class MainScene extends Phaser.Scene {
     this.linkButton(perfectTargetBtn, 'https://youtu.be/wOWJslOeJrQ?si=YM-xU548W6Gc3SRF');
     this.linkButton(stillCuteBtn, 'https://youtu.be/tNLlSWU1uzE?si=HbCAKn26j-TH3Pp7');
 
+    // 언어 바꾸기 버튼 (오른쪽 위)
+    addLanguageButton(this);
+
     // 저작권 안내 (맨 아래 가운데, 작고 흐리게)
     this.add
-      .text(left + centerX * bgScale, top + 950 * bgScale, '사용된 이미지·콘셉트의 저작권은 판타지오 및 원저작자에게 있습니다.', {
-        fontFamily: `${PIXEL_FONT}, sans-serif`,
+      .text(left + centerX * bgScale, top + 950 * bgScale, t('main.copyright'), {
+        fontFamily: PIXEL_FONT_STACK,
         fontSize: '22px',
         color: '#ffffff',
       })

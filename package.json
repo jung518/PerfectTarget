@@ -11,6 +11,8 @@
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
     "galmuri": "2.40.3",
+    "i18next": "^27.2.9",
+    "i18next-browser-languagedetector": "^8.3.1",
     "phaser": "^3.90.0"
   },
   "devDependencies": {
