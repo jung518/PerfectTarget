@@ -11,6 +11,22 @@
 5. **옷 입히기**: 옷장에서 상의, 하의, 신발을 골라 캐릭터를 꾸며요.
 6. **THE END**
 
+## 다국어 지원 🌏
+
+글로벌 팬들도 즐길 수 있도록 **한국어 · English · 日本語**를 지원해요.
+
+- 메인 화면 오른쪽 위 `KO | EN | JA` 탭을 눌러 언어를 바꿀 수 있어요.
+- 처음 들어오면 브라우저 언어에 맞춰 자동으로 골라지고, 고른 언어는 다음 방문 때도 유지돼요.
+- 주소 뒤에 `?lang=en`, `?lang=ja`를 붙이면 그 언어로 바로 열려요.
+
+**새 언어 추가하기**
+
+1. `src/i18n/locales/ko.json`을 복사해 새 언어 파일(예: `zh.json`)을 만들고 문구를 번역해요.
+2. `src/i18n/index.ts`의 `resources`와 `LANGUAGES`에 새 언어를 등록해요.
+3. `npm run build`로 확인해요. 빠진 번역 키나 오타가 있으면 에러로 알려 줘요.
+
+> 말풍선 대사는 띄어쓰기가 없는 언어(일본어 등)도 넘치지 않도록 `\n`으로 직접 줄을 나눠 주세요.
+
 ## 실행 방법
 
 ```bash
@@ -22,6 +38,7 @@ npm run build   # 배포용 빌드 (dist/ 폴더 생성)
 ## 사용한 기술
 
 - [Phaser 3](https://phaser.io/) + TypeScript + Vite
+- 다국어 처리: [i18next](https://www.i18next.com/) (번역 키 자동완성·누락 검사는 TypeScript로)
 - 효과음은 파일 없이 코드(Web Audio API)로 만들었어요.
 
 ## 폴더 구조
@@ -35,7 +52,9 @@ public/assets/images/
   dressup/       옷 입히기 게임
   common/        여러 화면에서 같이 쓰는 이미지
 src/scenes/      화면별 코드
-src/ui/          말풍선, 캐릭터, 뒤로 가기 버튼 등 공통 부품
+src/ui/          말풍선, 캐릭터, 뒤로 가기·언어 선택 버튼 등 공통 부품
+src/i18n/        다국어 설정
+  locales/       언어별 문구 (ko.json, en.json, ja.json)
 ```
 
 ## 저작권 안내
